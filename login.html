@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Mini Social App</title>
+</head>
+<body>
+    <h1>Mini Social App - Login</h1>
+
+    <h2>Login</h2>
+    <form id="login-form">
+        Username: <input id="login-user" type="text"><br>
+        Password: <input id="login-pass" type="password"><br>
+        <button type="submit">Login</button>
+    </form>
+
+    <script>
+        // Login form
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const user = document.getElementById('login-user').value;
+            const pass = document.getElementById('login-pass').value;
+            const res = await fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, password: pass })
+            });
+            if (res.ok) {
+                const data = await res.json();
+                localStorage.setItem('token', data.token);
+                alert('Logged in successfully');
+            } else {
+                const err = await res.json();
+                alert('Error: ' + (err.error || 'Unknown'));
+            }
+        });
+    </script>
+</body>
+</html>
