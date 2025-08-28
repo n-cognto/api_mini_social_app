@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Posts - Mini Social App</title>
+</head>
+<body>
+    <h1>Mini Social App - Posts</h1>
+
+    <h2>Post Message (Logged-in only)</h2>
+    <form id="post-form">
+        Message: <textarea id="post-msg"></textarea><br>
+        <button type="submit">Post</button>
+    </form>
+
+    <h2>View Posts</h2>
+    <button id="view-posts">Load Posts</button>
+    <div id="posts-list"></div>
+
+    <script>
+        // Post form
+        document.getElementById('post-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const msg = document.getElementById('post-msg').value;
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Please login first');
+                return;
+            }
+            const res = await fetch('/post', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token
+                },
+                body: JSON.stringify({ message: msg })
+            });
+            if (res.ok) {
+                alert('Posted successfully');
+            } else {
+                const err = await res.json();
+                alert('Error: ' + (err.error || 'Unknown'));
+            }
+        });
+
+        // View posts
+        document.getElementById('view-posts').addEventListener('click', async () => {
+            const res = await fetch('/api/posts');
+            if (res.ok) {
+                const posts = await res.json();
+                const list = document.getElementById('posts-list');
+                list.innerHTML = '';
+                posts.forEach(p => {
+                    const div = document.createElement('div');
+                    div.textContent = `${p.user}: ${p.msg}`;
+                    list.appendChild(div);
+                });
+            } else {
+                alert('Error loading posts');
+            }
+        });
+    </script>
+</body>
+</html>
